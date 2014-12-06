@@ -5,15 +5,43 @@ public class ZoneDetector : MonoBehaviour {
 
     public GameObject player;
 
-	void OnTriggerExit2D(Collider2D collider)
+    private int inWhiteZones = 0;
+    private int inBlackZones = 0;
+
+	void OnTriggerExit2D(Collider2D objCollider2D)
     {
-        if (collider.gameObject.layer == LayerMask.NameToLayer("White"))
+        if (objCollider2D.gameObject.layer == LayerMask.NameToLayer("White"))
         {
-            player.GetComponent<Character>().onWhiteZone = false;
+            inWhiteZones--;
         }
-        if (collider.gameObject.layer == LayerMask.NameToLayer("Black"))
+        if (objCollider2D.gameObject.layer == LayerMask.NameToLayer("Black"))
         {
-            player.GetComponent<Character>().onWhiteZone = true;
+            inBlackZones--;
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D objCollider2D)
+    {
+        if (objCollider2D.gameObject.layer == LayerMask.NameToLayer("White"))
+        {
+            inWhiteZones++;
+        }
+        if (objCollider2D.gameObject.layer == LayerMask.NameToLayer("Black"))
+        {
+            inBlackZones++;
+        }
+    }
+
+    public bool isInWhiteZone()
+    {
+        Debug.Log(inWhiteZones.ToString() + " " + inBlackZones.ToString());
+        return inWhiteZones > 0 && inBlackZones == 0;
+    }
+
+    public bool isInBlackZone()
+    {
+        Debug.Log(inWhiteZones.ToString() + " " + inBlackZones.ToString());
+
+        return inBlackZones > 0 && inWhiteZones == 0;
     }
 }

@@ -11,13 +11,6 @@ public class Character : MonoBehaviour
     public bool isBlack = true;
     public float gravityScale = 1.0f;
     SpriteRenderer sprite;
-    //CharacterController2D controller;
-    //NonPhysicsPlayerTester behaviour;
-   
-    //int blackLayer = 512;
-    //int whiteLayer = 256;
-    //int nothingLayer = 0;
-
     bool canJump = false;
     
 
@@ -25,13 +18,13 @@ public class Character : MonoBehaviour
     public float horizontalSpeed = 10.0f;
     public float jumpSpeed = 10.0f;
 
+    private ZoneDetector _zoneDetector;
+
     void Start()
     {
+        _zoneDetector = GetComponentInChildren<ZoneDetector>();
         sprite = GetComponent<SpriteRenderer>();
         rigidbody2D.gravityScale = 0.0f;
-        //controller = GetComponent<CharacterController2D>();
-        //behaviour = GetComponent<NonPhysicsPlayerTester>();
-        //controller.platformMask = blackLayer; 
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), !isBlack);
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), isBlack);
     }
@@ -47,40 +40,37 @@ public class Character : MonoBehaviour
                 Debug.Log("Swaped");
                 wantToChangeColor = true;
                 isBlack = !isBlack;
-                transform.position = transform.position;    
-                if(isBlack)
+                transform.position = transform.position;
+                if (isBlack)
                 {
-                    Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), isBlack);
+                    Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"),
+                        isBlack);
                 }
                 else
                 {
-                    Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), !isBlack);
+                    Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"),
+                        !isBlack);
                 }
-
-                //controller.collisionState.becameGroundedThisFrame = controller.collisionState.above;
-                //controller.platformMask = nothingLayer;
             }
 
-            
+
         }
 
-        if (wantToChangeColor && ((!onWhiteZone && !isBlack) || (onWhiteZone && isBlack)))
+        if (wantToChangeColor && 
+            ((_zoneDetector.isInBlackZone() && !isBlack) || (_zoneDetector.isInWhiteZone() && isBlack)))
         {
             wantToChangeColor = false;
-            //behaviour.gravity = -behaviour.gravity;
             gravityScale = -gravityScale;
             jumpSpeed = -jumpSpeed;
             if (isBlack)
             {
                 transform.rotation = Quaternion.AngleAxis(0, Vector3.forward);    
-                //controller.platformMask.value = whiteLayer; 
                 sprite.color = Color.black;
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), !isBlack);
             }
             else
             {
                 transform.rotation = Quaternion.AngleAxis(180, Vector3.forward);    
-                //controller.platformMask.value = blackLayer; 
                 sprite.color = Color.white;
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), isBlack);
             }

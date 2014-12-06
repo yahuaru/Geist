@@ -1,0 +1,12 @@
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\Assembly-CSharp.dll
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\Assembly-CSharp.pdb
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\UnityEditor.dll
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\UnityEngine.dll
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\UnityEngine.UI.dll
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\XInputDotNetPure.dll
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\UnityEngine.xml
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\UnityEditor.xml
+D:\Local Projects\Geist\Temp\UnityVS_bin\Debug\UnityEngine.UI.xml
+D:\Local Projects\Geist\obj\Debug\UnityVS.Geist.CSharp.csprojResolveAssemblyReference.cache
+D:\Local Projects\Geist\obj\Debug\Assembly-CSharp.dll
+D:\Local Projects\Geist\obj\Debug\Assembly-CSharp.pdb
