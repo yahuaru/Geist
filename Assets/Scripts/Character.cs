@@ -12,7 +12,9 @@ public class Character : MonoBehaviour
     public float gravityScale = 1.0f;
     SpriteRenderer sprite;
     bool canJump = false;
-    
+
+    public float runDamping = 20.0f;
+    public float airDamping = 5.0f;
 
     private Vector2 newVelocity;
     public float horizontalSpeed = 10.0f;
@@ -37,7 +39,6 @@ public class Character : MonoBehaviour
         {
             if (Input.GetButtonDown("SwapColors") && !wantToChangeColor)
             {
-                Debug.Log("Swaped");
                 wantToChangeColor = true;
                 isBlack = !isBlack;
                 transform.position = transform.position;
@@ -56,7 +57,7 @@ public class Character : MonoBehaviour
 
         }
 
-        if (wantToChangeColor && 
+        if (wantToChangeColor &&
             ((_zoneDetector.isInBlackZone() && !isBlack) || (_zoneDetector.isInWhiteZone() && isBlack)))
         {
             wantToChangeColor = false;
@@ -64,45 +65,46 @@ public class Character : MonoBehaviour
             jumpSpeed = -jumpSpeed;
             if (isBlack)
             {
-                transform.rotation = Quaternion.AngleAxis(0, Vector3.forward);    
+                transform.rotation = Quaternion.AngleAxis(0, Vector3.forward);
                 sprite.color = Color.black;
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), !isBlack);
             }
             else
             {
-                transform.rotation = Quaternion.AngleAxis(180, Vector3.forward);    
+                transform.rotation = Quaternion.AngleAxis(180, Vector3.forward);
                 sprite.color = Color.white;
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), isBlack);
             }
         }
 
-        int layerMask = LayerMask.NameToLayer("Player");
-        RaycastHit2D[] hits;
-        if(isBlack)
-        {
-            hits = Physics2D.RaycastAll(transform.position, -Vector2.up, 0.5f);
-        }
-        else
-        {
-            hits = Physics2D.RaycastAll(transform.position, Vector2.up, 0.5f);
-        }
-        foreach(RaycastHit2D hit in hits)
-        {
-            if(isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("Black")
-                || !isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("White"))
+            int layerMask = LayerMask.NameToLayer("Player");
+            RaycastHit2D[] hits;
+            if (isBlack)
             {
-                if (isBlack && Vector2.Dot(hit.normal, Vector2.up) < 0.891
-                    || !isBlack && Vector2.Dot(hit.normal, -Vector2.up) < 0.891)
+                hits = Physics2D.RaycastAll(transform.position, -Vector2.up, 0.5f);
+            }
+            else
+            {
+                hits = Physics2D.RaycastAll(transform.position, Vector2.up, 0.5f);
+            }
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("Black")
+                    || !isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("White"))
                 {
-                    return;
+                    if (isBlack && Vector2.Dot(hit.normal, Vector2.up) < 0.891
+                        || !isBlack && Vector2.Dot(hit.normal, -Vector2.up) < 0.891)
+                    {
+                        return;
+                    }
                 }
             }
-        }
-
-        Debug.DrawRay(transform.position, -Vector2.up * 0.5f, Color.green);
         
 
-        newVelocity.x = Input.GetAxis("Horizontal") * horizontalSpeed;
+        Debug.DrawRay(transform.position, -Vector2.up * 0.5f, Color.green);
+        float smoothedMovementFactor = canJump ? runDamping : airDamping;
+
+        newVelocity.x = Mathf.Lerp(newVelocity.x, Input.GetAxis("Horizontal") * horizontalSpeed, Time.deltaTime * smoothedMovementFactor);
         rigidbody2D.velocity = newVelocity;
 
         if (Input.GetButtonDown("Jump") && canJump)
@@ -118,8 +120,8 @@ public class Character : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collider)
     {
-        
-        if(collider.gameObject.layer == LayerMask.NameToLayer("Black") 
+
+        if (collider.gameObject.layer == LayerMask.NameToLayer("Black")
             || collider.gameObject.layer == LayerMask.NameToLayer("White"))
         {
             canJump = true;
