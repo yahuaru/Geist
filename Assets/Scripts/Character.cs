@@ -4,15 +4,13 @@ using System.Collections;
 [RequireComponent(typeof(SpriteRenderer))]
 public class Character : MonoBehaviour
 {
+
     public bool canChangeColor = false;
     bool wantToChangeColor = false;
     public bool onWhiteZone = true;
     public bool isBlack = true;
     public float gravityScale = 1.0f;
     SpriteRenderer sprite;
-
-    
-
     //CharacterController2D controller;
     //NonPhysicsPlayerTester behaviour;
    
