@@ -2,6 +2,8 @@
 using System.Collections;
 using XInputDotNetPure;
 
+//using XInputDotNetPure;
+
 [ExecuteInEditMode]
 public class LevelState : MonoBehaviour {
 
@@ -9,25 +11,19 @@ public class LevelState : MonoBehaviour {
     public bool isDead = false;
 
     private float deathTimer;
+    public Vector3 checkpoint;
+    public GameObject character;
 
 	public void Death()
 	{
 	    isDead = true;
+        character.GetComponent<Animator>().SetTrigger("IsDie");
 	}
 
     void Start()
     {
         deathTimer = deathTime;
-    }
-
-    public void NextLevel()
-    {
-        Application.LoadLevel(Application.loadedLevel + 1);
-    }
-
-    public void LoadLevel(int i)
-    {
-        Application.LoadLevel(i);
+        checkpoint = character.transform.position;
     }
 
     void Update()
@@ -37,17 +33,9 @@ public class LevelState : MonoBehaviour {
         {
             GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);    
         }
-
-        if (Input.GetButtonDown("NextLevel"))
-        {
-            NextLevel();
-        }
-        if(Input.GetKeyDown(KeyCode.P))
-        {
-            LoadLevel(0);
-        }
         if (isDead)
         {
+            character.rigidbody2D.velocity = Vector2.zero;
             GamePad.SetVibration(PlayerIndex.One, 1.0f, 1.0f);
             deathTimer -= Time.deltaTime;
             if (deathTimer < 0)
@@ -55,8 +43,28 @@ public class LevelState : MonoBehaviour {
                 deathTimer = deathTime;
                 isDead = false;
                 GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);    
-                LoadLevel(Application.loadedLevel);
+                character.transform.position = checkpoint;
+                character.GetComponent<Character>().forceChangeColor = !character.GetComponent<Character>().isBlack;
             }
         }
+        else
+        {
+            GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);    
+        }
+        if (Input.GetButton("Restart"))
+        {
+            //Destroy(character);
+            //Instantiate(character, checkpoint, Quaternion.identity);
+            Application.LoadLevel(Application.loadedLevel);
+        }
+        if (Input.GetButton("NextLevel"))
+        {
+            Application.LoadLevel(Application.loadedLevel + 1);
+        }
+    }
+
+    public void LoadLevel(int n)
+    {
+        Application.LoadLevel(Application.loadedLevel + 1);
     }
 }

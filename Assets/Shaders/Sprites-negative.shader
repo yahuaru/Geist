@@ -1,4 +1,4 @@
-Shader "Sprites/Negatives"
+Shader "Sprites/Default"
 {
 	Properties
 	{

@@ -60,15 +60,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\ChangeableObject.cs" />
-    <Compile Include="Assets\Scripts\Character.cs" />
-    <Compile Include="Assets\Scripts\EdgeDectector.cs" />
+    <Compile Include="Assets\Scripts\Character\Character.cs" />
+    <Compile Include="Assets\Scripts\Character\EdgeDectector.cs" />
+    <Compile Include="Assets\Scripts\Character\ZoneDetector.cs" />
+    <Compile Include="Assets\Scripts\Checkpoint.cs" />
     <Compile Include="Assets\Scripts\Envy.cs" />
     <Compile Include="Assets\Scripts\LeveCompleted.cs" />
     <Compile Include="Assets\Scripts\LevelState.cs" />
+    <Compile Include="Assets\Scripts\Parallax\ParallaxBackground.cs" />
+    <Compile Include="Assets\Scripts\Parallax\ParallaxCamera.cs" />
+    <Compile Include="Assets\Scripts\Parallax\ParallaxLayer.cs" />
+    <Compile Include="Assets\Scripts\SetSpriteLayer.cs" />
     <Compile Include="Assets\Scripts\ShowYouWin.cs" />
     <Compile Include="Assets\Scripts\SmoothCamera2D.cs" />
-    <Compile Include="Assets\Scripts\ZoneDetector.cs" />
+    <Compile Include="Assets\Scripts\Spawner.cs" />
+    <Compile Include="Assets\Scripts\Sprout.cs" />
     <Compile Include="Assets\Scripts\characterController.cs" />
   </ItemGroup>
   <ItemGroup>

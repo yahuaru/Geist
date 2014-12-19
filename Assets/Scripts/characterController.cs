@@ -9,8 +9,10 @@ public class characterController : MonoBehaviour {
 	public Transform groundCheck;
 	public float groundRadius = 0.2f;
 	public LayerMask whatIsGround;
-	public float score;
+	public float Score;
 	public float move;
+
+
 
 	private GameObject star;
 	// Use this for initialization
@@ -67,7 +69,7 @@ public class characterController : MonoBehaviour {
 						Application.LoadLevel (Application.loadedLevel);
 
 	    if (col.gameObject.name == "star") {
-						score++;
+						Score++;
 						Destroy (col.gameObject);
 				}
 
@@ -77,7 +79,7 @@ public class characterController : MonoBehaviour {
 	}
 
 	void OnGUI(){
-				GUI.Box (new Rect (0, 0, 100, 100), "Stars: " + score);
+				GUI.Box (new Rect (0, 0, 100, 100), "Stars: " + Score);
 		}
 		
 }
