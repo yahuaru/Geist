@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using XInputDotNetPure;
-
-//using XInputDotNetPure;
 
 [ExecuteInEditMode]
 public class LevelState : MonoBehaviour {
@@ -29,28 +26,20 @@ public class LevelState : MonoBehaviour {
     void Update()
     {
 
-        if (Application.isEditor)
-        {
-            GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);    
-        }
+        
         if (isDead)
         {
             character.rigidbody2D.velocity = Vector2.zero;
-            GamePad.SetVibration(PlayerIndex.One, 1.0f, 1.0f);
             deathTimer -= Time.deltaTime;
             if (deathTimer < 0)
             {
                 deathTimer = deathTime;
                 isDead = false;
-                GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);    
                 character.transform.position = checkpoint;
                 character.GetComponent<Character>().forceChangeColor = !character.GetComponent<Character>().isBlack;
             }
         }
-        else
-        {
-            GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);    
-        }
+
         if (Input.GetButton("Restart"))
         {
             //Destroy(character);
