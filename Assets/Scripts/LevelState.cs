@@ -36,7 +36,11 @@ public class LevelState : MonoBehaviour {
                 deathTimer = deathTime;
                 isDead = false;
                 character.transform.position = checkpoint;
-                character.GetComponent<Character>().forceChangeColor = !character.GetComponent<Character>().isBlack;
+                if (character.GetComponent<Character>().IsWhite)
+                {
+                    character.GetComponent<Character>().forceChangeColor = true;
+                    character.GetComponent<Character>().SwapColors();
+                }
             }
         }
 
