@@ -1,0 +1,224 @@
+From 8b1e9aa4cbb57e74e149c714e3c6d923e9535b09 Mon Sep 17 00:00:00 2001
+From: Zo0MER <exzo0mex@gmail.com>
+Date: Sat, 6 Dec 2014 23:55:28 +0300
+Subject: [PATCH] Character moving together with floor.
+
+---
+ Assets/Scripts/Character.cs                        |  68 +++++++++++++--------
+ Library/ScriptAssemblies/Assembly-CSharp.dll.mdb   | Bin 3548 -> 3591 bytes
+ Library/assetDatabase3                             | Bin 1184600 -> 1184600 bytes
+ .../metadata/36/36f38d7525d154e4ea50c602038213ce   | Bin 9489 -> 9821 bytes
+ 4 files changed, 42 insertions(+), 26 deletions(-)
+
+diff --git a/Assets/Scripts/Character.cs b/Assets/Scripts/Character.cs
+index d2a2b93..779f440 100644
+--- a/Assets/Scripts/Character.cs
++++ b/Assets/Scripts/Character.cs
+@@ -11,7 +11,6 @@ public class Character : MonoBehaviour
+     public bool isBlack = true;
+     public float gravityScale = 1.0f;
+     SpriteRenderer sprite;
+-    bool canJump = false;
+ 
+     public float runDamping = 20.0f;
+     public float airDamping = 5.0f;
+@@ -21,6 +20,9 @@ public class Character : MonoBehaviour
+     public float jumpSpeed = 10.0f;
+ 
+     private ZoneDetector _zoneDetector;
++    private GameObject _floor;
++    private Vector3 _floorPrevPos;
++    private bool isInAir = false;
+ 
+     void Start()
+     {
+@@ -77,40 +79,57 @@ public class Character : MonoBehaviour
+             }
+         }
+ 
+-            int layerMask = LayerMask.NameToLayer("Player");
+-            RaycastHit2D[] hits;
+-            if (isBlack)
+-            {
+-                hits = Physics2D.RaycastAll(transform.position, -Vector2.up, 0.5f);
+-            }
+-            else
+-            {
+-                hits = Physics2D.RaycastAll(transform.position, Vector2.up, 0.5f);
+-            }
+-            foreach (RaycastHit2D hit in hits)
++
++        if (isInAir)
++        {
++            _floor = null;
++        }
++
++        if (_floor != null && _floorPrevPos != _floor.transform.position)
++        {
++            transform.position += _floor.transform.position - _floorPrevPos;
++        }
++
++        isInAir = true;
++        int layerMask = LayerMask.NameToLayer("Player");
++        RaycastHit2D[] hits;
++        if (isBlack)
++        {
++            hits = Physics2D.RaycastAll(transform.position, -Vector2.up, 0.3f);
++        }
++        else
++        {
++            hits = Physics2D.RaycastAll(transform.position, Vector2.up, 0.3f);
++        }
++        foreach (RaycastHit2D hit in hits)
++        {
++            if (isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("Black")
++                || !isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("White"))
+             {
+-                if (isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("Black")
+-                    || !isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("White"))
++                isInAir = false;
++                _floor = hit.collider.gameObject;
++
++                if (isBlack && Vector2.Dot(hit.normal, Vector2.up) < 0.891
++                    || !isBlack && Vector2.Dot(hit.normal, -Vector2.up) < 0.891)
+                 {
+-                    if (isBlack && Vector2.Dot(hit.normal, Vector2.up) < 0.891
+-                        || !isBlack && Vector2.Dot(hit.normal, -Vector2.up) < 0.891)
+-                    {
+-                        return;
+-                    }
++                    return;
+                 }
+             }
+-        
++        }
+ 
+-        Debug.DrawRay(transform.position, -Vector2.up * 0.5f, Color.green);
+-        float smoothedMovementFactor = canJump ? runDamping : airDamping;
++        float smoothedMovementFactor = !isInAir ? runDamping : airDamping;
+ 
+         newVelocity.x = Mathf.Lerp(newVelocity.x, Input.GetAxis("Horizontal") * horizontalSpeed, Time.deltaTime * smoothedMovementFactor);
+         rigidbody2D.velocity = newVelocity;
+ 
+-        if (Input.GetButtonDown("Jump") && canJump)
++        if (Input.GetButtonDown("Jump") && !isInAir)
+         {
+             Jump();
+         }
++        if (!isInAir)
++        {
++            if (_floor != null) _floorPrevPos = _floor.transform.position;
++        }
+     }
+ 
+     void FixedUpdate()
+@@ -120,17 +139,14 @@ public class Character : MonoBehaviour
+ 
+     void OnCollisionEnter2D(Collision2D collider)
+     {
+-
+         if (collider.gameObject.layer == LayerMask.NameToLayer("Black")
+             || collider.gameObject.layer == LayerMask.NameToLayer("White"))
+         {
+-            canJump = true;
+         }
+     }
+ 
+     void Jump()
+     {
+-        canJump = false;
+         rigidbody2D.AddForce(Vector2.up * jumpSpeed);
+     }
+ }
+diff --git a/Library/ScriptAssemblies/Assembly-CSharp.dll.mdb b/Library/ScriptAssemblies/Assembly-CSharp.dll.mdb
+index c90c4be16f938aebf72e8a848a03a073c4874080..7fa005be826f4d78ba188757aa2f5811398a95eb 100644
+GIT binary patch
+delta 1688
+zcmY*ZX>3(R6u#@+weQ~hwjwRqU5FGD1eK*k>|(+6LDirXHNnazsK{dC5Av!6T4;%B
+zr-ecdCKL+VMJgmv`dTAU3N6ZJBhV(Aumqz*H=;o+e)Ha=#7VySzB%X2nKR41eR0L{
+z1>U;gNOIck>?vHN4W^4dvxB=|+_SDeeNSQF1;xd2Yv77CI8Fy2jp4WjV5XNx^#tf*
+z_<!LcqD^s?7v$S@nKf2Y>ZQERTTXm2r#Wj$d24pUftKGEc87ZB?3-_2xq5zO$?Vss
+zl{EA>mo(%)*OxJz@)1qor`ruy)B72>Q}U{AU3R^BwxWQp<e#^@m+OfG!#(r9+*qBY
+zJhR{&ZQ<wIR~D@Q=6e46yrS*d$6HsgO{8ui$6h?+=|!?VF{k3yOFwk|S`wfuU@Tj7
+z=IyLbSMFZt;NGPprMqdnFwfrY`T65<6RL9#b;%Q7TJp*TI!4U3(}p&_+j;hlK=aED
+zlZ!tLd`H)a^KDaY8C;#zl~dhW*?B)(f9vphF<BTN#~Z6wm8wsw9**aQ-wojp;|`8O
+z62uiN*PGNPlX!<_kZG@Vi04H90h%=;Hc1iHE%is$J*i5L*sA0bg*O}JzX%_*iJ*7=
+z$@=ij&1$I{Q9IN&l`WD=>q%NLw$R8{YYlaOW}#7NsP7qSysmc}!a~!?{9IUU8sa^+
+zu)y=8E!ezjs;!m1#;ii4BE+iRY6>Cq6fP4DIg5GTQ0tlFs7pBJYQYP@AY8!IsVtz3
+z1%yl%als{AbOo-lknr3}xUMtDpi3BX4Tq-+;i(+qBryXnahoNUT9sC0iYThQsfH+X
+z?6<@^>wrbe6>qTJlD@UhM1v$z;f+FsNLMZCn$^q9(TaQtoFs`RZyYw>VFCS?G+^Bi
+z2RvF=X6wr3wp?M?*pYQ*QH!LM8*I7JZer$W%CV`O6qH35Z}f(9$|r64l>L1;BAV0T
+zB(f9n<c3Xd+IONki5SBhnaupaCPmICPGl(}y75Sud51%GI@P1**r>VDAx+NLqvm+t
+zn5nbyQx55HPSZwp?z6oP>2o%@S&@&nrLb)&U%8cf_Yvm84Jg<ayBMXzt(<mu(sV73
+z^tzQk_e~nmVwHc~>WF)bhpyJL5_fsjW1bV9|EJVgO6`V6yXm<@FKTJZ1CLhZE%(xY
+zwbWp}S8MRLc_S-nVlrMq=4BTDlUKXqy*lcc2uD`f(eKp;yo1c~u<Xg4q^sL8N#E+z
+zxA~|ql1&%waNYWTpI+xXFlzPjG3vfD7T)TU^pLNO*6Fjzk3PM}H%M>m3Ca$?zSm#t
+zr<O5ke8{i2`7ih%W(=T=!))qZzuxa3po@&mV7kI_9fadRBnRCLK!sibUJPi^Mc@qp
+zesQD*Tm|5hCP%;r0TcQ>_$+{rhTH=80eI|0L9)N0@c>B@bUc99L8gPBQn?_9TP6h<
+z1OVI_*#Q0kz&(&M@TUOIi`0U50XPYA9DE4C&d5b@ClCvrfNCXR4D?L!G~hAld~hx>
+z7J4ms84w5knHI#48iRNYu7OVi<Dl<>?*ikY6R~YK@HliHcs7s#y$oCcBti$l>wqNa
+w8gM0$4BZSq2&6!Ff!l#pXcNab1f9kbO~D`qcmjGUI3Jh*y%D^YPLHYm4|?2##{d8T
+
+delta 1683
+zcmZ8h3v3is6rDG3_RVj1c6N7mp+79$vO+`~4H!#{LE1t~l#loekQi)BsDL)H1~B3R
+z1xsy<v{OPUC@N3_Vky?31r#GtD#Y-Sl42VuLMR5P_@O{S@x0vy5?|)bIq%;4?z`_Z
+zQ<m73FwJTR{}T*d%6USFHdlIW%9`&>a(C60-)MVh;l3`HAQZ!OMH2)(LM8f>!CYs?
+z^ib#-x*&8Dh*;}#RZp8@PVEy9zg>}(Q=eMY)jOr8qk2zH^4`bCo<H&Gfl142Ki$7A
+z>(;;(-DTgL3K07Bt%(;p-h49EPA2K*w{3-og`82@tL6<Y`}bl&id{s;nBBv2{~Gbi
+z)^Qc>$wSII6VBKzB+m@a_h0{E*yQXFngZ|TnduX3uQ<-!LciL+^xFJqDyL;F{C(c(
+zBlc_<s|FX@JAPfAU3s!@_3A&{`|R(;31(y8Tq~}pVQkCvwAAz&^(*axG}r8@%#2&G
+zV&ue)yOw#cH9vjKE~b;rW^>k0M|v+kyKmNWNh9O6Uz(57pg1Uw=yT>&D32&Ufe`VE
+zE?(7pu@#a?XBU-dw#kMQ!ye5>rXQo%DY=X0?x*!qRMks=JBaqBbiqON6%M?e=lMGl
+zwL#u2^E5&GM-~bP^7VXOnWrm>ns!7NUvlc=bf->l@_Zs8)DTUgR47hmPi?23$xA7B
+zihG?6I3YBoDIvP@Ik#6DVwJJdfR#ii8j->M3yD+Nt7r3wO@_GHXyg%*k)?#_;jHuA
+z(`tx^jJC*FF;b+!1c{D@i=H)TxA9wS5Ty!FXLCotL2ny({x?SAV<g)x)w(}&M<<e~
+zO!RziZgfjK+)dmZtI(fp_shmp2i;Pu`)I`eV0H)3<hbZ|^ti9ZGC8Ok&E!~OI+mKH
+z_829B)tQd9=4bXy#s6B1$#$Fj&FHj@x`>{I9PFgY+Ran<&0ZWVH(xf{74zzS^MIIn
+zsfU$%mU-?aNhEp(k6!Cx^`3Qhhmsd=^01wr4jw@slq>Uc<+~nvvA5hC9W0|<C%4vn
+z<#pcm+!|YVd`OUFY7o6spUVT9yz)-(?npo^W3C`6Vy+8L<+xWl;q8Qzih4oeTP5}<
+zY6k1|DpkHU_BqwhT72qm-+ud!8e%7XYP;_uWLy}_>D1rFgB0pwOI>2sSkban8pM^!
+z`k6bnTk029<9)|4II<&-gO=KA9pa9AYkW+QG^GlIv@@1=*18lMq){`nNUh(}Zd-Tm
+zSv}NGT*{_O9>2=3Rr_n~<67pUTm9NL{~<rJ3QEcB!m0T)=N4iPNu%jRFV*I3<R_zD
+z_G>r%H~sb~efXg2fL0UO9Eg^#(TS+Ana3OmXa@tW_A)&yEXsngg$V+P#pC4$6zEKF
+z8lXbI2+jlWcVori*8zOZtQ@=ua6)eae+=N$Vtc?l0bFm^1wIDg7P1@QKLA`CW?&LY
+z5yAql0!u?D2;iL91aLOsgPsX~8NkM{1>iRTte<@dUJhVotO2|p7yx}8d>R-CZK84w
+zh=UG+lYn^W@!$*~0lGj9;~$MqB04+3bwCpIVekQ95Og272Y3iN1zX?)lA$xeX~1CU
+z7r?nd3Uo2J2na&I4_*YMLT>=uz!2zj;5Hz{6Uo@iTj)FtJqkJm426CkJl-yFZTt`5
+CGkM$q
+
+diff --git a/Library/assetDatabase3 b/Library/assetDatabase3
+index 24f79a59f16100cb7bd3f2d03c112641e280cd36..a48e58b922fa36d1b46e140e1976cb2d3691a403 100644
+GIT binary patch
+delta 110
+zcmcby%;Ux~j}1x=EGAkSvdwA^?P?B;K+FWh%s|Wn#H>Kf2E^<@%mKulK+LsW&4K%s
+ugFx(m$?xtlkw)80{_1+p6ujQ9(8vwMJV49~#C$-^55xl76&eLCCIJ9#o+9=D
+
+delta 110
+zcmcby%;Ux~j}1x=EO%6G8Jg7`+SMEwftU%1nSq!Eh*^P{4T#x+m;;D8ftYK%ngjPM
+u2Z6TOZ4rk$Rj!`8$P@5%^|^$0g+^{5<^f_}Am#&NejpauuFxoGF$n<PMkNCP
+
+diff --git a/Library/metadata/36/36f38d7525d154e4ea50c602038213ce b/Library/metadata/36/36f38d7525d154e4ea50c602038213ce
+index 19d1bf7ac31c326a52dabd4bb13ab2fd7ca4b970..293c60908bd20207918cd8c43e0ec27277965abc 100644
+GIT binary patch
+delta 686
+zcmaKp%SyvQ6oykpjFno`6cdeUPO4Pvr4$uhNWE>OBH9P=LX`v~X;PC|5cCBE7kWh8
+zx+?CJid$W}bS=~;(48B1PDs2&(Sd=PGvEB@@*mCD7ifxNjwvdYzoHMBmN%B7Y>I3Q
+z#X9hsxobFJYn9kW2w&Of1dvs>v`W!YV6IqFme#kF4F}d#-88KUoQcOrM*UmCQYr=0
+zo`{6Me_A(99W*;{%xD(mKrQOFQme;Hbll@yR#TzhL$I9_6i=MM#*VK0axS(X2?zi9
+zpzM*5N(Czc^57vE$0{1OYFedC*|arBGYw?8E)<0D>PG+u|Dj<xDE((upN%@!jzTD0
+z6ld{7OyG^!f!$mbHxpTu<kp@c$Yw^>bWq6c(p?G}QY3sVa0H)Zeqnf<7$agVwn@uq
+zNGtdtvI9S6{7u-?1iu5w;hw}dy0x7XiB_o%^T1;S(nKms&QqA>Ijlk_UUtUtiKiRM
+z;Bi_`)3TqVR+gJW&Hl}`3{R7M)J@|$`4yM?f)1sFLnIFS_TURAVl{b>+dUUJ-aCYk
+KNdeD#ci#btw#Lu^
+
+delta 362
+zcmccXGtrBKfkAK*1B1%njU2s#oNI*`7>XHycrv4q*yJsO2bk=HHkSz{Gm0w!K~jEx
+zjzV%`o>ysZfr70<T4GM|<g3CTHtUFHaZHw%;+VWa&TjH6Ii<;F(uR|l$s363hNUK#
+z<QEy~l@{nI80eX%X<GAgO;%Kro}4YC3RGdoh9vY?UT1QpjQHeuMgGa|3W1XalvpOO
+z2eOwd_)Yealm?0iK*jvPbbzEdkd_6rb(Q!hYbwb}@^bNVfm{j#E~!bS>3S|jiRD3w
+zm6H$3iz*^HM?nkh9vube{G9wEz4W5g)I3e=$zDpD>`)JGu2y1YgmEUzDM(FTq%1Mn
+rSmog4Pb#Y?JIJx{Awr_0s5Eu5qKd-gO{(Go2w_kFrCLwkuR0F^U-E67
+
+-- 
+1.9.1
+
