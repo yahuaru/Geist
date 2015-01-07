@@ -2,9 +2,6 @@
 using System.Collections;
 
 public class ZoneDetector : MonoBehaviour {
-
-    public GameObject player;
-
     private int inWhiteZones = 0;
     private int inBlackZones = 0;
 

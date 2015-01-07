@@ -21,9 +21,10 @@ public class FallScript : MonoBehaviour {
 		transform.Translate (-Vector2.up * speed_ * Time.deltaTime);
 		time_ -= Time.deltaTime;
 
-		if(time_ < 0) {
-			Instantiate (envy, position_, Quaternion.identity);
-			Destroy (gameObject);
+		if(time_ < 0)
+		{
+		    transform.position = position_;
+		    time_ = time;
 		}
 	}
 }

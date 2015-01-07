@@ -16,7 +16,7 @@ public class FinalTitle : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D collider){
 		if(collider.tag =="Player"){
-			chararcter.GetComponent<Character>().horizontalSpeed = 0;
+            chararcter.GetComponent<Character>().runSpeed = 0;
 			becomeNotOpacity = true;
 			tempColor = sprite1.color;
 		}

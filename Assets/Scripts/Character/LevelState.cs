@@ -44,7 +44,7 @@ public class LevelState : MonoBehaviour {
 
 				//RestartLevel();
 				//character.GetComponent<Character>().gravityScale = Mathf.Abs(character.GetComponent<Character>().gravityScale);  
-				character.GetComponent<Character>().forceChangeColor = !character.GetComponent<Character>().isBlack;
+				character.GetComponent<Character>().forceChangeColor = character.GetComponent<Character>().IsWhite;
 				character.transform.position = checkpoint;
 
 

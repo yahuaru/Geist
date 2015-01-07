@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EdgeDectector : MonoBehaviour {
+public class EdgeDectector : MonoBehaviour
+{
 
-    public GameObject player;
+    private bool nearZoneEdge = false;
 
-	void OnTriggerStay2D(Collider2D collider)
+    public bool NearZoneEdge
     {
-
-        if(collider.gameObject.layer == LayerMask.NameToLayer("Black") ||
-            collider.gameObject.layer == LayerMask.NameToLayer("White"))
-            player.GetComponent<Character>().canChangeColor = true;
+        get { return nearZoneEdge; }
     }
+
+    void OnTriggerStay2D(Collider2D objCollider)
+	{
+        nearZoneEdge = (objCollider.gameObject.layer == LayerMask.NameToLayer("Black")) || 
+            (objCollider.gameObject.layer == LayerMask.NameToLayer("White"));
+	}
 }
