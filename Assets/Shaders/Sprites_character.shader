@@ -23,7 +23,7 @@
 		Lighting Off
 		ZWrite Off
 		Fog { Mode Off }
-		Blend One OneMinusSrcColor
+		Blend OneMinusDstColor OneMinusSrcAlpha
 
 		Pass
 		{
@@ -54,7 +54,6 @@
 				v2f OUT;
 				OUT.vertex = mul(UNITY_MATRIX_MVP, IN.vertex);
 				OUT.texcoord = IN.texcoord;
-				OUT.color = IN.color * _Color;
 				#ifdef PIXELSNAP_ON
 				OUT.vertex = UnityPixelSnap (OUT.vertex);
 				#endif
@@ -66,7 +65,7 @@
 
 			fixed4 frag(v2f IN) : SV_Target
 			{
-				fixed4 c =tex2D(_MainTex, IN.texcoord).a * IN.color;
+				fixed4 c = fixed4(1, 1, 1, tex2D(_MainTex, IN.texcoord).a);
 				c.rgb *= c.a;
 				return c;
 			}
