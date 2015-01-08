@@ -28,7 +28,7 @@ public class LevelState : MonoBehaviour {
     void Start() {
         deathTimer = deathTime;
 		animator = GetComponent<Animator> ();
-		checkpoint = new Vector2 (11, 1);
+		checkpoint = new Vector2 (4, 0);
     }
 
     void Update() {
@@ -56,6 +56,9 @@ public class LevelState : MonoBehaviour {
 		}
 		if(Input.GetKeyDown("q")){
 			Application.Quit();
+		}
+		if(Input.GetKeyDown(KeyCode.Escape)) {
+			Application.LoadLevel("Menu");
 		}
 
         

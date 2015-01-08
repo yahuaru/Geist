@@ -30,13 +30,12 @@ public class Character : MonoBehaviour
 		rigidbody2D.AddForce(Vector2.up * jumpSpeed);
 	}
 
-	void Movement() {
+	void Movement(){
 		newVelocity = rigidbody2D.velocity;
 		float smoothedMovementFactor = isInAir ? airDamping : runDamping;
 		newVelocity.x = Mathf.Lerp(newVelocity.x, Input.GetAxis("Horizontal") * horizontalSpeed, Time.deltaTime * smoothedMovementFactor);
 		rigidbody2D.velocity = newVelocity;
 	}
-
     void Start()
     {
         _zoneDetector = GetComponentInChildren<ZoneDetector>();
@@ -82,10 +81,8 @@ public class Character : MonoBehaviour
 	}
     void Update()
     {
-        
-		SwitchDefaultStatement ();
 
-		Movement ();
+		SwitchDefaultStatement ();
 
 		if (Input.GetButtonDown("Jump") && !isInAir) {
 			Jump();
@@ -146,7 +143,6 @@ public class Character : MonoBehaviour
         }
 
         isInAir = true;
-        //int layerMask = LayerMask.NameToLayer("Player");
         RaycastHit2D[] hits;
         
 		if (isBlack)
@@ -158,8 +154,7 @@ public class Character : MonoBehaviour
             hits = Physics2D.RaycastAll(transform.position, Vector2.up, 0.5f);
         }
 
-        foreach (RaycastHit2D hit in hits)
-        {
+        foreach (RaycastHit2D hit in hits) {
             if (isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("Black")
                 || !isBlack && hit.collider.gameObject.layer == LayerMask.NameToLayer("White"))
             {
@@ -175,20 +170,16 @@ public class Character : MonoBehaviour
             }
         }
 
+		/*Player Movement*/
+		Movement ();
+		
     }
 
     void FixedUpdate()
     {
         rigidbody2D.AddForce(Vector3.down * Physics2D.gravity.magnitude * gravityScale);
     }
-
-    /*void OnCollisionEnter2D(Collision2D objCollision2D)
-    {
-        if (objCollision2D.gameObject.layer == LayerMask.NameToLayer("Black")
-            || objCollision2D.gameObject.layer == LayerMask.NameToLayer("White"))
-        {
-        }
-    }*/
+	
 
   
 }
