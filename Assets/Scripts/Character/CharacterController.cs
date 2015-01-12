@@ -5,7 +5,6 @@ using InControl;
 [RequireComponent(typeof(Character))]
 public class CharacterController : MonoBehaviour
 {
-
     private Character character;
 
     // Use this for initialization

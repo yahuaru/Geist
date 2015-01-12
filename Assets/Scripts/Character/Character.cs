@@ -41,6 +41,9 @@ public class Character : MonoBehaviour
 
     public bool forceChangeColor = false;
 
+    [Range(0, 100)]
+    public float maxJumpVelocity = 10.0f;
+
     public bool IsWhite
     {
         get { return currentColor == ColorState.White; }
@@ -67,8 +70,6 @@ public class Character : MonoBehaviour
             (zoneDetector.isInBlackZone() && currentColor == ColorState.Black ||
             zoneDetector.isInWhiteZone() && currentColor == ColorState.White))
         {
-            currentState = State.Falling;
-            jumpSpeed = -jumpSpeed;
             if (currentColor == ColorState.White)
             {
                 currentColor = ColorState.Black;
@@ -83,6 +84,12 @@ public class Character : MonoBehaviour
             }
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), currentColor == ColorState.White);
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), currentColor == ColorState.Black);
+
+            newVelocity = rigidbody2D.velocity;
+            newVelocity.y = Mathf.Clamp(newVelocity.y, -maxJumpVelocity, maxJumpVelocity);
+            rigidbody2D.velocity = newVelocity;
+            currentState = State.Falling;
+
         }
 
         if (currentState == State.Running && floor != null)
@@ -92,7 +99,8 @@ public class Character : MonoBehaviour
 
         if (currentState == State.Running || currentState == State.Falling)
         {
-            int layerMask = currentColor == ColorState.Black ? 1 << LayerMask.NameToLayer("Black") : 1 << LayerMask.NameToLayer("White");
+            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black") 
+                                                               : 1 << LayerMask.NameToLayer("White");
             groundHit = Physics2D.Raycast(transform.position, downDirection, 0.5f, layerMask);
             if (groundHit.collider != null)
             {

@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using XInputDotNetPure;
 using System;
+using InControl;
 
 
 [ExecuteInEditMode]
@@ -42,23 +43,14 @@ public class LevelState : MonoBehaviour {
                 deathTimer = deathTime;
 				isDead = false;
 
-				//RestartLevel();
-				//character.GetComponent<Character>().gravityScale = Mathf.Abs(character.GetComponent<Character>().gravityScale);  
 				character.GetComponent<Character>().forceChangeColor = character.GetComponent<Character>().IsWhite;
 				character.transform.position = checkpoint;
-
-
             }
         }
 
-		if (Input.GetKeyDown("r")) {
-			RestartLevel();
-		}
-		if(Input.GetKeyDown("q")){
+		if(Input.GetKeyDown(KeyCode.Escape)){
 			Application.Quit();
-		}
-
-        
+		} 
     }
 
    

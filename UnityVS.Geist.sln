@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityVS.Geist.CSharp", "UnityVS.Geist.CSharp.csproj", "{4AE66CF3-5385-722C-9FE6-D910973E5D78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityVS.Geist.CSharp.Editor", "UnityVS.Geist.CSharp.Editor.csproj", "{64E0A01F-BCB2-0EEB-7010-A61ED240F828}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{4AE66CF3-5385-722C-9FE6-D910973E5D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AE66CF3-5385-722C-9FE6-D910973E5D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AE66CF3-5385-722C-9FE6-D910973E5D78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64E0A01F-BCB2-0EEB-7010-A61ED240F828}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64E0A01F-BCB2-0EEB-7010-A61ED240F828}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64E0A01F-BCB2-0EEB-7010-A61ED240F828}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64E0A01F-BCB2-0EEB-7010-A61ED240F828}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

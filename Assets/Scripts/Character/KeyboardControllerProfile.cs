@@ -34,7 +34,7 @@ public class KeyboardControllerProfile : UnityInputDeviceProfile
 				Handle = "Combo",
 				Target = InputControlType.Action3,
 				// KeyCodeComboButton requires that all KeyCode params are down simultaneously.
-				Source = KeyCodeButton( KeyCode.X )
+				Source = KeyCodeButton( KeyCode.X, KeyCode.RightShift )
 			},
 		};
 
