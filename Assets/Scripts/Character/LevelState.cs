@@ -11,6 +11,7 @@ public class LevelState : MonoBehaviour {
     public bool isDead = false;
     public Vector3 checkpoint;
     public GameObject character;
+	
 
 	Animator animator;
 	private float deathTimer;
@@ -28,7 +29,7 @@ public class LevelState : MonoBehaviour {
     void Start() {
         deathTimer = deathTime;
 		animator = GetComponent<Animator> ();
-		checkpoint = new Vector2 (4, 0);
+		checkpoint = new Vector2 (3, 0);
     }
 
     void Update() {
