@@ -38,4 +38,10 @@ public class ZoneDetector : MonoBehaviour {
     {
         return inBlackZones > 0 && inWhiteZones == 0;
     }
+
+    public void Reset()
+    {
+        inWhiteZones = 0;
+        inBlackZones = 0;
+    }
 }

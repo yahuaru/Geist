@@ -8,7 +8,7 @@ public class Character : MonoBehaviour
 
     private enum State
     {
-        Falling, Running, Transition
+        Falling, Running, Transition, Death
     };
 
     private enum ColorState
@@ -39,10 +39,12 @@ public class Character : MonoBehaviour
     private RaycastHit2D groundHit;
     private Vector2 downDirection;
 
-    public bool forceChangeColor = false;
-
     [Range(0, 100)]
     public float maxJumpVelocity = 10.0f;
+
+    private Animator animator;
+
+    public Vector3 checkpointPos;
 
     public bool IsWhite
     {
@@ -54,6 +56,7 @@ public class Character : MonoBehaviour
         zoneDetector = GetComponentInChildren<ZoneDetector>();
         edgeDectector = GetComponentInChildren<EdgeDectector>();
         sprite = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
 
         currentColor = (zoneDetector.isInBlackZone()) ? ColorState.White : ColorState.Black;
         downDirection = currentColor == ColorState.Black ? -Vector2.up : Vector2.up;
@@ -62,6 +65,8 @@ public class Character : MonoBehaviour
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), currentColor == ColorState.Black);
 
         rigidbody2D.gravityScale = 0;
+
+        checkpointPos = transform.position;
     }
 
     void Update()
@@ -89,7 +94,6 @@ public class Character : MonoBehaviour
             newVelocity.y = Mathf.Clamp(newVelocity.y, -maxJumpVelocity, maxJumpVelocity);
             rigidbody2D.velocity = newVelocity;
             currentState = State.Falling;
-
         }
 
         if (currentState == State.Running && floor != null)
@@ -115,7 +119,10 @@ public class Character : MonoBehaviour
 
     void FixedUpdate()
     {
-        rigidbody2D.AddForce(downDirection * Physics2D.gravity.magnitude * gravityScale);
+        if (currentState == State.Falling || currentState == State.Running || currentState == State.Transition)
+        {
+            rigidbody2D.AddForce(downDirection * Physics2D.gravity.magnitude * gravityScale);            
+        }
     }
 
     public void Jump()
@@ -146,15 +153,33 @@ public class Character : MonoBehaviour
         rigidbody2D.velocity = newVelocity;
     }
 
-    public void SwapColors()
+    public void SwapColors(bool forceChangeColor = false)
     {
         if ((edgeDectector.NearZoneEdge && currentState != State.Transition) || forceChangeColor)
         {
-            forceChangeColor = false;
             ChangeState(State.Transition);
         }
     }
 
+
+    public void Death()
+    {
+        if (currentState != State.Death)
+        {
+            rigidbody2D.velocity = Vector2.zero;
+            ChangeState(State.Death);   
+        }
+    }
+
+    public void Respawn()
+    {
+        ChangeState(State.Falling);
+        transform.position = checkpointPos;
+        if (currentColor == ColorState.White)
+        {
+            SwapColors(true);   
+        }
+    }
 
     private void ChangeState(State state)
     {
@@ -180,6 +205,11 @@ public class Character : MonoBehaviour
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), true);
             }
             transform.position = transform.position;
+        }
+
+        if (state == State.Death)
+        {
+            animator.SetTrigger("IsDead");
         }
 
         currentState = state;
