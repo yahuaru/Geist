@@ -13,7 +13,7 @@ public class Character : MonoBehaviour
 
     private enum ColorState
     {
-        White, Black
+        White, Black, Both
     }
 
     private State currentState;
@@ -46,6 +46,8 @@ public class Character : MonoBehaviour
 
     public Vector3 checkpointPos;
 
+    private readonly Vector3 deltaColliderTransofrm = new Vector3(0.0f, 0.03f);
+
     public bool IsWhite
     {
         get { return currentColor == ColorState.White; }
@@ -58,7 +60,7 @@ public class Character : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
-        currentColor = (zoneDetector.isInBlackZone()) ? ColorState.White : ColorState.Black;
+        currentColor = (CurrentZone() == ColorState.Black) ? ColorState.White : ColorState.Black;
         downDirection = currentColor == ColorState.Black ? -Vector2.up : Vector2.up;
 
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), currentColor == ColorState.White);
@@ -71,43 +73,64 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        if (currentState == State.Transition &&
-            (zoneDetector.isInBlackZone() && currentColor == ColorState.Black ||
-            zoneDetector.isInWhiteZone() && currentColor == ColorState.White))
-        {
-            if (currentColor == ColorState.White)
-            {
-                currentColor = ColorState.Black;
-                transform.rotation = Quaternion.AngleAxis(0, Vector3.forward);
-                downDirection = -Vector2.up;
-            }
-            else
-            {
-                currentColor = ColorState.White;
-                transform.rotation = Quaternion.AngleAxis(180, Vector3.forward);
-                downDirection = Vector2.up;
-            }
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), currentColor == ColorState.White);
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), currentColor == ColorState.Black);
 
-            newVelocity = rigidbody2D.velocity;
-            newVelocity.y = Mathf.Clamp(newVelocity.y, -maxJumpVelocity, maxJumpVelocity);
-            rigidbody2D.velocity = newVelocity;
-            currentState = State.Falling;
+        if (currentState == State.Transition)
+        {
+            if ((currentColor == ColorState.White && CurrentZone() == ColorState.White)
+                || (currentColor == ColorState.Black && CurrentZone() == ColorState.Black))
+            {
+
+                if (currentColor == ColorState.White)
+                {
+                    currentColor = ColorState.Black;
+                    transform.rotation = Quaternion.AngleAxis(0, Vector3.forward);
+                    downDirection = -Vector2.up;
+                }
+                else
+                {
+                    currentColor = ColorState.White;
+                    transform.rotation = Quaternion.AngleAxis(180, Vector3.forward);
+                    downDirection = Vector2.up;
+                }
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), currentColor == ColorState.White);
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), currentColor == ColorState.Black);
+
+                newVelocity = rigidbody2D.velocity;
+                newVelocity.y = Mathf.Clamp(newVelocity.y, -maxJumpVelocity, maxJumpVelocity);
+                rigidbody2D.velocity = newVelocity;
+                currentState = State.Falling;
+            }
         }
 
         if (currentState == State.Running && floor != null)
         {
-            transform.position += floor.position - floorPrevPos;
+            Vector3 posDelta = floor.position - floorPrevPos;
+            if (posDelta != Vector3.zero)
+            {
+                int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
+                                                               : 1 << LayerMask.NameToLayer("White");
+                Debug.DrawRay(transform.position - deltaColliderTransofrm, 
+                    Vector3.Normalize(posDelta) * (posDelta.magnitude + 0.25f), Color.red);
+                RaycastHit2D wallHit = Physics2D.Raycast(transform.position - deltaColliderTransofrm, 
+                    Vector3.Normalize(posDelta), posDelta.magnitude + 0.25f, layerMask);
+                if (wallHit.collider == null)
+                {
+                    transform.position += posDelta;
+                }
+            }
         }
 
         if (currentState == State.Running || currentState == State.Falling)
         {
-            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black") 
+            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
                                                                : 1 << LayerMask.NameToLayer("White");
-            groundHit = Physics2D.Raycast(transform.position, downDirection, 0.5f, layerMask);
+            Debug.DrawRay(transform.position, downDirection * 0.36f, Color.red);
+            groundHit = Physics2D.Raycast(transform.position, downDirection, 0.36f, layerMask);
             if (groundHit.collider != null)
             {
+                floor = groundHit.collider.transform;
+                floorPrevPos = floor.transform.position;
+
                 ChangeState(State.Running);
             }
             else
@@ -121,7 +144,7 @@ public class Character : MonoBehaviour
     {
         if (currentState == State.Falling || currentState == State.Running || currentState == State.Transition)
         {
-            rigidbody2D.AddForce(downDirection * Physics2D.gravity.magnitude * gravityScale);            
+            rigidbody2D.AddForce(downDirection * Physics2D.gravity.magnitude * gravityScale);
         }
     }
 
@@ -169,7 +192,7 @@ public class Character : MonoBehaviour
         if (currentState != State.Death)
         {
             rigidbody2D.velocity = Vector2.zero;
-            ChangeState(State.Death);   
+            ChangeState(State.Death);
         }
     }
 
@@ -179,17 +202,12 @@ public class Character : MonoBehaviour
         transform.position = checkpointPos;
         if (currentColor == ColorState.White)
         {
-            SwapColors(true);   
+            SwapColors(true);
         }
     }
 
     private void ChangeState(State state)
     {
-        if (currentState == State.Falling && state == State.Running)
-        {
-            floor = groundHit.collider.transform;
-            floorPrevPos = floor.transform.position;
-        }
 
         if (currentState == State.Running && state == State.Falling)
         {
@@ -215,5 +233,29 @@ public class Character : MonoBehaviour
         }
 
         currentState = state;
+    }
+
+    ColorState CurrentZone()
+    {
+        int layerMask = 1 << LayerMask.NameToLayer("Black") | 1 << LayerMask.NameToLayer("White");
+        Collider2D[] collides2D = Physics2D.OverlapCircleAll(collider2D.bounds.center, 0.25f, layerMask);
+        bool inBlackZone = false;
+        bool inWhiteZone = false;
+        foreach (var collider in collides2D)
+        {
+            inBlackZone = inBlackZone || collider.gameObject.layer == LayerMask.NameToLayer("Black");
+            inWhiteZone = inWhiteZone || collider.gameObject.layer == LayerMask.NameToLayer("White");
+        }
+
+        if (inBlackZone && !inWhiteZone)
+        {
+            return ColorState.Black;
+        }
+        if (inWhiteZone && !inBlackZone)
+        {
+            return ColorState.White;
+        }
+
+        return ColorState.Both;
     }
 }
