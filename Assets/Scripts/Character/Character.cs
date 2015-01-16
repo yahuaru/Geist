@@ -46,8 +46,6 @@ public class Character : MonoBehaviour
 
     public Vector3 checkpointPos;
 
-    private readonly Vector3 deltaColliderTransofrm = new Vector3(0.0f, 0.03f);
-
     public bool IsWhite
     {
         get { return currentColor == ColorState.White; }
@@ -100,31 +98,16 @@ public class Character : MonoBehaviour
 
         if (currentState == State.Running && floor != null)
         {
-            Vector3 posDelta = floor.position - floorPrevPos;
-            if (posDelta != Vector3.zero)
-            {
-                int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
-                                                               : 1 << LayerMask.NameToLayer("White");
-                Debug.DrawRay(transform.position - deltaColliderTransofrm, Vector3.Normalize(posDelta) * (posDelta.magnitude + 0.25f), Color.red);
-                RaycastHit2D wallHit = Physics2D.Raycast(transform.position - deltaColliderTransofrm, Vector3.Normalize(posDelta), posDelta.magnitude + 0.25f, layerMask);
-                if (wallHit.collider == null)
-                {
-                    transform.position += posDelta;
-                }   
-            }
+            transform.position += floor.position - floorPrevPos;
         }
 
         if (currentState == State.Running || currentState == State.Falling)
         {
             int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black") 
                                                                : 1 << LayerMask.NameToLayer("White");
-            Debug.DrawRay(transform.position, downDirection * 0.36f, Color.red);
-            groundHit = Physics2D.Raycast(transform.position, downDirection, 0.36f, layerMask);
+            groundHit = Physics2D.Raycast(transform.position, downDirection, 0.5f, layerMask);
             if (groundHit.collider != null)
             {
-                floor = groundHit.collider.transform;
-                floorPrevPos = floor.transform.position;
-
                 ChangeState(State.Running);
             }
             else
@@ -204,7 +187,8 @@ public class Character : MonoBehaviour
     {
         if (currentState == State.Falling && state == State.Running)
         {
-            
+            floor = groundHit.collider.transform;
+            floorPrevPos = floor.transform.position;
         }
 
         if (currentState == State.Running && state == State.Falling)
