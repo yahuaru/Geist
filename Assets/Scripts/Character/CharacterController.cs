@@ -28,7 +28,6 @@ public class CharacterController : MonoBehaviour
             character.SwapColors();
         }
 
-        character.Running(controller.LeftStickX);
-        character.Falling(controller.LeftStickX);
+        character.HorizontalMovement(controller.LeftStickX);
     }
 }

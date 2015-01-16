@@ -133,22 +133,25 @@ public class Character : MonoBehaviour
         }
     }
 
-    public void Falling(float perc)
+    public void HorizontalMovement(float perc)
     {
         newVelocity = rigidbody2D.velocity;
-        if (currentState == State.Running && Vector2.Dot(groundHit.normal, -downDirection) >= 0.891)
+        switch (currentState)
         {
-            newVelocity.x = Mathf.Lerp(newVelocity.x, perc * fallingControllSpeed, Time.deltaTime * fallDamping);
-        }
-        rigidbody2D.velocity = newVelocity;
-    }
+            case State.Running:
+                if (Vector2.Dot(groundHit.normal, -downDirection) >= 0.891)
+                {
+                    newVelocity.x = Mathf.Lerp(newVelocity.x, perc * runSpeed, Time.deltaTime * runDamping);
+                }
+                break;
 
-    public void Running(float perc)
-    {
-        newVelocity = rigidbody2D.velocity;
-        if (currentState == State.Running && Vector2.Dot(groundHit.normal, -downDirection) >= 0.891)
-        {
-            newVelocity.x = Mathf.Lerp(newVelocity.x, perc * runSpeed, Time.deltaTime * runDamping);
+            case State.Falling:
+                newVelocity.x = Mathf.Lerp(newVelocity.x, perc * fallingControllSpeed, Time.deltaTime * fallDamping);
+                break;
+
+            case State.Transition:
+                newVelocity.x = Mathf.Lerp(newVelocity.x, perc * fallingControllSpeed, Time.deltaTime * fallDamping);
+                break;
         }
         rigidbody2D.velocity = newVelocity;
     }
@@ -160,7 +163,6 @@ public class Character : MonoBehaviour
             ChangeState(State.Transition);
         }
     }
-
 
     public void Death()
     {
