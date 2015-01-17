@@ -29,7 +29,6 @@ public class Character : MonoBehaviour
     public float jumpSpeed = 10.0f;
     public float fallingControllSpeed = 10.0f;
 
-    private EdgeDectector edgeDectector;
     private SpriteRenderer sprite;
 
     private Transform floor;
@@ -54,7 +53,6 @@ public class Character : MonoBehaviour
 
     void Start()
     {
-        edgeDectector = GetComponentInChildren<EdgeDectector>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
@@ -108,9 +106,9 @@ public class Character : MonoBehaviour
             {
                 int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
                                                                : 1 << LayerMask.NameToLayer("White");
-                Debug.DrawRay(transform.position - deltaColliderTransofrm, 
+                Debug.DrawRay(transform.position - deltaColliderTransofrm,
                     Vector3.Normalize(posDelta) * (posDelta.magnitude + 0.25f), Color.red);
-                RaycastHit2D wallHit = Physics2D.Raycast(transform.position - deltaColliderTransofrm, 
+                RaycastHit2D wallHit = Physics2D.Raycast(transform.position - deltaColliderTransofrm,
                     Vector3.Normalize(posDelta), posDelta.magnitude + 0.25f, layerMask);
                 if (wallHit.collider == null)
                 {
@@ -180,9 +178,16 @@ public class Character : MonoBehaviour
 
     public void SwapColors(bool forceChangeColor = false)
     {
-        if ((edgeDectector.NearZoneEdge && currentState != State.Transition) || forceChangeColor)
+        if (currentState != State.Transition)
         {
-            ChangeState(State.Transition);
+            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
+                                                               : 1 << LayerMask.NameToLayer("White");
+            Collider2D overlapResult = Physics2D.OverlapCircle(collider2D.bounds.center, 0.7f, layerMask);
+
+            if (overlapResult != null || forceChangeColor)
+            {
+                ChangeState(State.Transition);
+            }
         }
     }
 
