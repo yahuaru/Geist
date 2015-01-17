@@ -84,6 +84,7 @@
     <Compile Include="Assets\Scripts\SetSpriteLayer.cs" />
     <Compile Include="Assets\Scripts\Spawner.cs" />
     <Compile Include="Assets\Scripts\Sprout.cs" />
+    <Compile Include="Assets\Scripts\TrackingEye.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Sprites_character.shader" />

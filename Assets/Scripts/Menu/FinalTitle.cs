@@ -7,6 +7,7 @@ public class FinalTitle : MonoBehaviour {
 	public GameObject chararcter; 	
 	public SpriteRenderer  sprite1;
 	public SpriteRenderer  sprite2;
+	public SpriteRenderer  sprite3;
 	public float opacitySpeed = 5;
 
 
@@ -26,6 +27,7 @@ public class FinalTitle : MonoBehaviour {
 			tempColor.a +=(Time.deltaTime*opacitySpeed/100); 
 			sprite1.color = tempColor;
 			sprite2.color = tempColor;
+			sprite3.color = tempColor;
 		}
 	}
 }
