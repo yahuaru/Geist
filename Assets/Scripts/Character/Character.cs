@@ -182,13 +182,13 @@ public class Character : MonoBehaviour
             int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
                                                                : 1 << LayerMask.NameToLayer("White");
             var nextFrameVelocityDirection = 
-                downDirection * gravityScale * Physics2D.gravity.magnitude * Time.fixedDeltaTime * 5
+                downDirection * gravityScale * Physics2D.gravity.magnitude * Time.fixedDeltaTime
                 + rigidbody2D.velocity;
-            nextFrameVelocityDirection.Normalize();
-            Debug.DrawRay(collider2D.bounds.center, nextFrameVelocityDirection * raycastTransitionDetectionLength, 
+
+            Debug.DrawRay(collider2D.bounds.center, nextFrameVelocityDirection, 
                 Color.magenta, 4.0f);
-            var hitResult = Physics2D.Raycast(collider2D.bounds.center, nextFrameVelocityDirection, 
-                raycastTransitionDetectionLength, layerMask);
+            var hitResult = Physics2D.Raycast(collider2D.bounds.center, nextFrameVelocityDirection.normalized,
+                nextFrameVelocityDirection.magnitude, layerMask);
 
             if (hitResult.collider != null || forceChangeColor)
             {
