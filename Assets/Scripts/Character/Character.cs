@@ -38,7 +38,10 @@ public class Character : MonoBehaviour
     private Vector2 downDirection;
 
     [Range(0, 100)]
-    public float maxJumpVelocity = 10.0f;
+    public float maxTransitionJumpVelocity = 10.0f;
+
+    [Range(0.3f, 10f)]
+    public float raycastTransitionDetectionLength = 1.6f;
 
     private Animator animator;
 
@@ -89,13 +92,8 @@ public class Character : MonoBehaviour
                     transform.rotation = Quaternion.AngleAxis(180, Vector3.forward);
                     downDirection = Vector2.up;
                 }
-                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), currentColor == ColorState.White);
-                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), currentColor == ColorState.Black);
 
-                newVelocity = rigidbody2D.velocity;
-                newVelocity.y = Mathf.Clamp(newVelocity.y, -maxJumpVelocity, maxJumpVelocity);
-                rigidbody2D.velocity = newVelocity;
-                currentState = State.Falling;
+                ChangeState(State.Falling);
             }
         }
 
@@ -180,17 +178,17 @@ public class Character : MonoBehaviour
     {
         if (currentState != State.Transition)
         {
-            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("White")
-                                                               : 1 << LayerMask.NameToLayer("Black");
-            RaycastHit2D hitResult;
-            if (Mathf.Approximately(rigidbody2D.velocity.magnitude, 0.0f))
-            {
-                hitResult = Physics2D.Raycast(transform.position, downDirection, 0.7f, layerMask);
-            }
-            else
-            {
-                hitResult = Physics2D.Raycast(transform.position, rigidbody2D.velocity.normalized, 0.7f, layerMask);
-            }
+
+            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
+                                                               : 1 << LayerMask.NameToLayer("White");
+            var nextFrameVelocityDirection = 
+                downDirection * gravityScale * Physics2D.gravity.magnitude * Time.fixedDeltaTime * 5
+                + rigidbody2D.velocity;
+            nextFrameVelocityDirection.Normalize();
+            Debug.DrawRay(collider2D.bounds.center, nextFrameVelocityDirection * raycastTransitionDetectionLength, 
+                Color.magenta, 4.0f);
+            var hitResult = Physics2D.Raycast(collider2D.bounds.center, nextFrameVelocityDirection, 
+                raycastTransitionDetectionLength, layerMask);
 
             if (hitResult.collider != null || forceChangeColor)
             {
@@ -222,9 +220,22 @@ public class Character : MonoBehaviour
     private void ChangeState(State state)
     {
 
-        if (currentState == State.Running && state == State.Falling)
+        if (state == State.Falling)
         {
-            floor = null;
+            if (currentState == State.Running)
+            {
+                floor = null;
+            }
+            else if (currentState == State.Transition)
+            {
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Black"), LayerMask.NameToLayer("Player"), currentColor == ColorState.White);
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("White"), LayerMask.NameToLayer("Player"), currentColor == ColorState.Black);
+
+                //Limit height of the transition jump
+                newVelocity = rigidbody2D.velocity;
+                newVelocity.y = Mathf.Clamp(newVelocity.y, -maxTransitionJumpVelocity, maxTransitionJumpVelocity);
+                rigidbody2D.velocity = newVelocity;
+            }
         }
 
         if (state == State.Transition)
@@ -244,6 +255,7 @@ public class Character : MonoBehaviour
         {
             animator.SetTrigger("IsDead");
         }
+
 
         currentState = state;
     }
