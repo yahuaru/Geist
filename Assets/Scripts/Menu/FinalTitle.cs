@@ -8,6 +8,7 @@ public class FinalTitle : MonoBehaviour {
 	public SpriteRenderer  sprite1;
 	public SpriteRenderer  sprite2;
 	public SpriteRenderer  sprite3;
+	public SpriteRenderer  sprite4;
 	public float opacitySpeed = 5;
 
 
@@ -28,6 +29,7 @@ public class FinalTitle : MonoBehaviour {
 			sprite1.color = tempColor;
 			sprite2.color = tempColor;
 			sprite3.color = tempColor;
+			sprite4.color = tempColor;
 		}
 	}
 }
