@@ -180,11 +180,19 @@ public class Character : MonoBehaviour
     {
         if (currentState != State.Transition)
         {
-            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
-                                                               : 1 << LayerMask.NameToLayer("White");
-            Collider2D overlapResult = Physics2D.OverlapCircle(collider2D.bounds.center, 0.7f, layerMask);
+            int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("White")
+                                                               : 1 << LayerMask.NameToLayer("Black");
+            RaycastHit2D hitResult;
+            if (Mathf.Approximately(rigidbody2D.velocity.magnitude, 0.0f))
+            {
+                hitResult = Physics2D.Raycast(transform.position, downDirection, 0.7f, layerMask);
+            }
+            else
+            {
+                hitResult = Physics2D.Raycast(transform.position, rigidbody2D.velocity.normalized, 0.7f, layerMask);
+            }
 
-            if (overlapResult != null || forceChangeColor)
+            if (hitResult.collider != null || forceChangeColor)
             {
                 ChangeState(State.Transition);
             }
@@ -204,7 +212,8 @@ public class Character : MonoBehaviour
     {
         ChangeState(State.Falling);
         transform.position = checkpointPos;
-        if (currentColor == ColorState.White)
+        ColorState currentZone = CurrentZone();
+        if (currentColor == currentZone || currentZone == ColorState.Both)
         {
             SwapColors(true);
         }

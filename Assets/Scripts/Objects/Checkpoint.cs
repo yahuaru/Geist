@@ -13,7 +13,7 @@ public class Checkpoint : MonoBehaviour {
         Character character = collider.GetComponent<Character>();
         if (character != null)
         {
-            character.checkpointPos = transform.position;
+            character.checkpointPos = character.transform.position;
         }
     }
 }

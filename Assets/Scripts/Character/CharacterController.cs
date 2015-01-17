@@ -6,8 +6,6 @@ using InControl;
 public class CharacterController : MonoBehaviour
 {
     private Character character;
-    private bool prevAction1 = false;
-    private bool prevAction3 = false;
 
 
     // Use this for initialization
@@ -21,19 +19,16 @@ public class CharacterController : MonoBehaviour
     {
         var controller = InputManager.ActiveDevice;
 
-        if (controller.Action1 && !prevAction1)
+        if (controller.Action1.WasPressed)
         {
             character.Jump();
             
         }
-        prevAction1 = controller.Action1;
 
-        if (controller.Action3 && !prevAction3)
+        if (controller.Action3.WasPressed)
         {
             character.SwapColors();
         }
-        prevAction3 = controller.Action3;
-
 
         character.HorizontalMovement(controller.LeftStickX);
     }
