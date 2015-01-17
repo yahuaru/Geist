@@ -29,7 +29,6 @@ public class Character : MonoBehaviour
     public float jumpSpeed = 10.0f;
     public float fallingControllSpeed = 10.0f;
 
-    private ZoneDetector zoneDetector;
     private EdgeDectector edgeDectector;
     private SpriteRenderer sprite;
 
@@ -55,7 +54,6 @@ public class Character : MonoBehaviour
 
     void Start()
     {
-        zoneDetector = GetComponentInChildren<ZoneDetector>();
         edgeDectector = GetComponentInChildren<EdgeDectector>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
@@ -76,8 +74,9 @@ public class Character : MonoBehaviour
 
         if (currentState == State.Transition)
         {
-            if ((currentColor == ColorState.White && CurrentZone() == ColorState.White)
-                || (currentColor == ColorState.Black && CurrentZone() == ColorState.Black))
+            ColorState zoneColor = CurrentZone();
+            if ((currentColor == ColorState.White && zoneColor == ColorState.White)
+                || (currentColor == ColorState.Black && zoneColor == ColorState.Black))
             {
 
                 if (currentColor == ColorState.White)
@@ -124,8 +123,8 @@ public class Character : MonoBehaviour
         {
             int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
                                                                : 1 << LayerMask.NameToLayer("White");
-            Debug.DrawRay(transform.position, downDirection * 0.36f, Color.red);
-            groundHit = Physics2D.Raycast(transform.position, downDirection, 0.36f, layerMask);
+            Debug.DrawRay(transform.position, downDirection * 0.4f, Color.red);
+            groundHit = Physics2D.Raycast(transform.position, downDirection, 0.4f, layerMask);
             if (groundHit.collider != null)
             {
                 floor = groundHit.collider.transform;

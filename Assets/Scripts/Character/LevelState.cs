@@ -16,6 +16,7 @@ public class LevelState : MonoBehaviour {
 	Animator animator;
 	private float deathTimer;
 
+    
 	private void RestartLevel() 
     {
 		Application.LoadLevel(Application.loadedLevel);
@@ -39,8 +40,7 @@ public class LevelState : MonoBehaviour {
     {
 		if(Input.GetKeyDown(KeyCode.Escape)){
 			Application.Quit();
-		} 
-    }
+		}
 
-   
+    }
 }

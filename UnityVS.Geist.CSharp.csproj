@@ -176,12 +176,12 @@
     <Compile Include="Assets\Scripts\Character\KeyboardControllerProfile.cs" />
     <Compile Include="Assets\Scripts\Character\LevelState.cs" />
     <Compile Include="Assets\Scripts\Character\ZoneDetector.cs" />
-    <Compile Include="Assets\Scripts\Checkpoint.cs" />
     <Compile Include="Assets\Scripts\DangerStar.cs" />
     <Compile Include="Assets\Scripts\Menu\FinalTitle.cs" />
     <Compile Include="Assets\Scripts\Menu\MainMenu.cs" />
     <Compile Include="Assets\Scripts\Menu\QuitGame.cs" />
     <Compile Include="Assets\Scripts\Menu\ShowYouWin.cs" />
+    <Compile Include="Assets\Scripts\Objects\Checkpoint.cs" />
     <Compile Include="Assets\Scripts\Objects\Envy.cs" />
     <Compile Include="Assets\Scripts\Objects\FallScript.cs" />
     <Compile Include="Assets\Scripts\Objects\HorizontalMove.cs" />
@@ -197,8 +197,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\InControl\README\README.txt" />
-    <None Include="Assets\Shader\SpriteColored.shader" />
     <None Include="Assets\Shaders\Sprites_character.shader" />
+    <None Include="Assets\Shaders\Sprites-negative.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>
