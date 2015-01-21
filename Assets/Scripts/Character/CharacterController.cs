@@ -27,7 +27,7 @@ public class CharacterController : MonoBehaviour
 
         if (controller.Action3.WasPressed)
         {
-            character.SwapColors();
+            character.SwapColors(perc: controller.LeftStickX);
         }
 
         character.HorizontalMovement(controller.LeftStickX);

@@ -174,18 +174,21 @@ public class Character : MonoBehaviour
         rigidbody2D.velocity = newVelocity;
     }
 
-    public void SwapColors(bool forceChangeColor = false)
+    public void SwapColors(bool forceChangeColor = false, float perc = 0.0f)
     {
-        if (currentState != State.Transition)
+        if (currentState == State.Falling || currentState == State.Running)
         {
 
             int layerMask = (currentColor == ColorState.Black) ? 1 << LayerMask.NameToLayer("Black")
                                                                : 1 << LayerMask.NameToLayer("White");
-            var nextFrameVelocityDirection = 
-                downDirection * gravityScale * Physics2D.gravity.magnitude * Time.fixedDeltaTime
-                + rigidbody2D.velocity;
+            var movementVelocity = Vector2.zero;
+            movementVelocity.x = Mathf.Lerp(newVelocity.x, perc * fallingControllSpeed, Time.deltaTime * fallDamping);
 
-            Debug.DrawRay(collider2D.bounds.center, nextFrameVelocityDirection, 
+            var nextFrameVelocityDirection =
+                downDirection * gravityScale * Physics2D.gravity.magnitude * Time.fixedDeltaTime
+                + rigidbody2D.velocity + movementVelocity;
+
+            Debug.DrawRay(collider2D.bounds.center, nextFrameVelocityDirection,
                 Color.magenta, 4.0f);
             var hitResult = Physics2D.Raycast(collider2D.bounds.center, nextFrameVelocityDirection.normalized,
                 nextFrameVelocityDirection.magnitude, layerMask);
